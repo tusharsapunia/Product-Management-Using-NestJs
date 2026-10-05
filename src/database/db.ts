@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 
 const client = new MongoClient(
-  'mongodb+srv://tusharsapunia:TusharSapunia@cluster0.w8os3fl.mongodb.net/?appName=Cluster0',
+  'mongodb+srv://tusharsapunia:password@cluster0.w8os3fl.mongodb.net/?appName=Cluster0',
 );
 
 export async function dbConnect() {

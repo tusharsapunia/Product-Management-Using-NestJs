@@ -34,7 +34,7 @@ export class ProductService {
     if (!Data) {
       throw new NotFoundException('ProductNot Found...');
     }
-    await this.ProductRepo.update(id, data);
+    await this.ProductRepo.update(id, {stock: 7});
     return await this.ProductRepo.findOneBy({ id });
   }
 

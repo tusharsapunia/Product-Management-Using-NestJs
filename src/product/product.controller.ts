@@ -9,74 +9,43 @@ import {
   Put,
 } from '@nestjs/common';
 import { ProductService } from './product.service.js';
+import { ProductDTO } from './Dtos/product.dto.js';
+import { PartialProduct } from './Dtos/partial.dto.js';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  //GET Method :-
-  @Get()
-  getProducts() {
-    return this.productService.getAllProducts();
+  // Post Method:-
+  @Post()
+  async createProduct(@Body() data: ProductDTO) {
+    return this.productService.createProduct(data);
   }
 
+  //Get Method:-
+  @Get()
+  async getAll() {
+    return this.productService.getAllProduct();
+  }
   @Get(':id')
-  getOne(@Param('id') id: string) {
+  async getOne(@Param('id') id: number) {
     return this.productService.getProductById(id);
   }
 
-  //POST Method :-
-  @Post()
-  createNew(
-    @Body()
-    body: {
-      name: string;
-      description: string;
-      price: number;
-      stock: number;
-      category: string;
-      status: string;
-    },
-  ) {
-    return this.productService.createNew(body);
-  }
+  //Put Method:-
 
-  //DELETE Method :-
-  @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.productService.deleteOne(id);
-  }
-
-  // POST Method :-
   @Put(':id')
-  update(
-    @Param('id') id: string,
-    @Body()
-    body: {
-      name: string;
-      description: string;
-      price: number;
-      stock: number;
-      category: string;
-      status: string;
-    },
-  ) {
-    return this.productService.update(id, body);
+  async update(@Param('id') id: number, @Body() data: ProductDTO) {
+    return this.productService.updateProduct(id, data);
   }
-  //PATCH Method:-
+
   @Patch(':id')
-  updateOne(
-    @Param('id') id: string,
-    @Body()
-    body: Partial<{
-      name: string;
-      description: string;
-      price: number;
-      stock: number;
-      category: string;
-      status: string;
-    }>,
-  ) {
-    return this.productService.patchUpdate(id, body);
+  async patchupdate(@Param('id') id: number, @Body() data: PartialProduct) {
+    return this.productService.patchUpdate(id, data);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: number) {
+    return this.productService.productDelete(id);
   }
 }

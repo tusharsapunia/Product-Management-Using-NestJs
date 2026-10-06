@@ -1,118 +1,59 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { dbConnect } from '../database/db.js';
-import { ObjectId } from 'mongodb';
-import { NetworkResources } from 'inspector/promises';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductDTO } from './Dtos/product.dto.js';
+import { Product } from './product.entity.js';
+import { Repository } from 'typeorm';
+import { PartialProduct } from './Dtos/partial.dto.js';
 
 @Injectable()
 export class ProductService {
-  //Method to get all products:-
-  async getAllProducts() {
-    const collection = await dbConnect();
-    const result = await collection.find().toArray();
-    return result;
-  }
-  //Method to get a single product by id:-
+  constructor(
+    @InjectRepository(Product) private ProductRepo: Repository<Product>,
+  ) {}
 
-  async getProductById(id: string) {
-    const collection = await dbConnect();
-    const result = await collection.findOne({ _id: new ObjectId(id) });
-    if (!result) {
-      throw new NotFoundException({ message: 'Not Found !', result: result });
-    }
-    return { message: 'Data Found', result: result };
+  //Method For insert Product:-
+  async createProduct(data: ProductDTO): Promise<Product> {
+    const newProduct = this.ProductRepo.create(data);
+    return this.ProductRepo.save(newProduct);
+  }
+  //Get Products:-
+  async getAllProduct(): Promise<Product[]> {
+    return this.ProductRepo.find();
   }
 
-  //Method to create a new product
-
-  async createNew(data: {
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    category: string;
-    status: string;
-  }) {
-    const { name, description, price, stock, category, status } = { ...data };
-    if (!name || !description || !price || !stock || !category || !status) {
-      throw new NotFoundException({
-        message: 'Enter Valid Data!',
-        status: null,
-      });
+  async getProductById(id: number): Promise<Product> {
+    const Data = await this.ProductRepo.findOneBy({ id });
+    if (!Data) {
+      throw new NotFoundException('ProductNot Found...');
     }
-    const collection = await dbConnect();
-    const result = await collection.insertOne(data);
-    return { message: 'Data Submit', result: result };
+    return Data;
   }
 
-  //Method for Delete Product by Id
-
-  async deleteOne(id: string) {
-    const collection = await dbConnect();
-    const result = await collection.deleteOne({ _id: new ObjectId(id) });
-    if (result.deletedCount > 0) {
-      return { message: 'Product Delete', result: result };
-    } else {
-      throw new NotFoundException({ message: 'Not Found !', result: result });
+  async updateProduct(id: number, data: ProductDTO): Promise<Product | null> {
+    const Data = await this.ProductRepo.findOneBy({ id });
+    if (!Data) {
+      throw new NotFoundException('ProductNot Found...');
     }
+    await this.ProductRepo.update(id, data);
+    return await this.ProductRepo.findOneBy({ id });
   }
 
-  //Method for Update product all details :-
-
-  async update(
-    id: string,
-    data: {
-      name: string;
-      description: string;
-      price: number;
-      stock: number;
-      category: string;
-      status: string;
-    },
-  ) {
-    const { name, description, price, stock, category, status } = { ...data };
-    if (!name || !description || !price || !stock || !category || !status) {
-      throw new NotFoundException({
-        message: 'Enter Valid Data!',
-        status: null,
-      });
+  async patchUpdate(id: number, data: PartialProduct): Promise<Product | null> {
+    const Data = await this.ProductRepo.findOneBy({ id });
+    if (!Data) {
+      throw new NotFoundException('ProductNot Found...');
     }
-    const collection = await dbConnect();
-    const result = await collection.replaceOne({ _id: new ObjectId(id) }, data);
-
-    if (result.matchedCount === 1) {
-      return { message: 'Data Update Successfully!', result: result };
-    } else {
-      throw new NotFoundException({
-        message: 'Product Not Found',
-        result: result,
-      });
-    }
+    await this.ProductRepo.update(id, data);
+    return await this.ProductRepo.findOneBy({ id });
   }
 
-  //Method for Update
-  async patchUpdate(
-    id: string,
-    data: Partial<{
-      name: string;
-      description: string;
-      price: number;
-      stock: number;
-      category: string;
-      status: string;
-    }>,
-  ) {
-    const collection = await dbConnect();
-    const result = await collection.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: data },
-    );
-    if (result.matchedCount === 1) {
-      return { message: 'Data Update Successfully!', result: result };
-    } else {
-      throw new NotFoundException({
-        message: 'Product Not Found',
-        result: result,
-      });
+  async productDelete(id: number): Promise<Product | null> {
+    const Data = await this.ProductRepo.findOneBy({ id });
+    if (!Data) {
+      throw new NotFoundException('ProductNot Found...');
     }
+    await this.ProductRepo.delete({ id });
+
+    return Data;
   }
 }

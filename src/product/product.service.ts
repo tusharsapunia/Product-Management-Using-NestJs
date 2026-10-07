@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Search } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductDTO } from './Dtos/product.dto.js';
 import { Product } from './product.entity.js';
@@ -17,8 +17,24 @@ export class ProductService {
     return this.ProductRepo.save(newProduct);
   }
   //Get Products:-
-  async getAllProduct(): Promise<Product[]> {
-    return this.ProductRepo.find();
+  async getAllProduct(page = 1, limit = 10, search?: string) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.ProductRepo.findAndCount({
+      where: search
+        ? {
+            name: search,
+          }
+        : {},
+      skip,
+      take: limit,
+    });
+
+    return {
+      data,
+      page,
+      limit,
+      total,
+    };
   }
 
   async getProductById(id: number): Promise<Product> {
@@ -34,7 +50,7 @@ export class ProductService {
     if (!Data) {
       throw new NotFoundException('ProductNot Found...');
     }
-    await this.ProductRepo.update(id, {stock: 7});
+    await this.ProductRepo.update(id, { stock: 7 });
     return await this.ProductRepo.findOneBy({ id });
   }
 

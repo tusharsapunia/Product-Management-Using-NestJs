@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsInt, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsInt, IsString } from 'class-validator';
 import { OrderProductDTO } from './orderproduct.dto.js';
-import { Transform } from 'class-transformer';
+import { OrderEnum } from '../enum/orderstatus.enum.js';
 export class OrderDTO {
   // @ApiProperty()
   // @IsInt()
@@ -9,9 +9,11 @@ export class OrderDTO {
   @ApiProperty()
   @IsString()
   name: string;
+
   @ApiProperty()
   @IsInt()
-  mobile: number;
+  mobile: bigint;
+
   @ApiProperty()
   @IsString()
   address: string;
@@ -21,10 +23,6 @@ export class OrderDTO {
   products: OrderProductDTO[];
 
   @ApiProperty()
-  @IsInt()
-  amount: number;
-
-  @ApiProperty()
-  @IsString()
-  status: string;
+  @IsEnum(OrderEnum)
+  status: OrderEnum;
 }

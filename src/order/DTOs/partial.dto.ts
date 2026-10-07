@@ -1,18 +1,20 @@
+import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import { OrderEnum } from '../enum/orderstatus.enum.js';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString } from 'class-validator';
 
 export class partialOrder {
+  @ApiProperty()
   @IsOptional()
   @IsString()
   customername: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsInt()
-  MonilNumber: number;
+  MobileNumber: bigint;
+
+  @ApiProperty()
   @IsOptional()
   @IsString()
   Address: string;
-  @IsOptional()
-  @IsString()
-  status: string;
 }

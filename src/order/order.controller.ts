@@ -1,8 +1,18 @@
-import { Body, Controller, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { OrderService } from './order.service.js';
-import { OrderDTO } from './DTOs/order.dto.js';
-import { partialOrder } from './DTOs/partial.dto.js';
+import { OrderDTO } from './dtos/order.dto.js';
+import { partialOrder } from './dtos/partial.dto.js';
 import { timeStamp } from 'console';
+import { StatusOrder } from './dtos/statusorder.dto.js';
 
 @Controller('order')
 export class OrderController {
@@ -13,14 +23,22 @@ export class OrderController {
     return this.orderService.createOrder(Data);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   async updateData(@Param('id') id: number, @Body() data: partialOrder) {
     return this.orderService.updateOrder(id, data);
   }
+  @Patch('status/:id')
+  async updateStatus(@Param('id') id: number, @Body() data: StatusOrder) {
+    return this.orderService.updateStatus(id, data);
+  }
 
   @Get()
-  async getAll() {
-    return this.orderService.getAll();
+  getAll(
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
+    @Query('search') search: string,
+  ) {
+    return this.orderService.getAll(Number(page), Number(limit), search);
   }
 
   @Get(':id')

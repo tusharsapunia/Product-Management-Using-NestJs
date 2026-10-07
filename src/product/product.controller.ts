@@ -7,6 +7,8 @@ import {
   Patch,
   Post,
   Put,
+  Query,
+  Search,
 } from '@nestjs/common';
 import { ProductService } from './product.service.js';
 import { ProductDTO } from './Dtos/product.dto.js';
@@ -24,8 +26,8 @@ export class ProductController {
 
   //Get Method:-
   @Get()
-  async getAll() {
-    return this.productService.getAllProduct();
+  async getAll(@Query('page') page = '1', @Query('limit') limit = '10' , @Query('search') search:string) {
+    return this.productService.getAllProduct(Number(page), Number(limit) , search);
   }
   @Get(':id')
   async getOne(@Param('id') id: number) {

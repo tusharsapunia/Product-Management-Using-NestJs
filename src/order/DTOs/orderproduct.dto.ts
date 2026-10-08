@@ -1,12 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt } from 'class-validator';
+import { IsInt, IsNotEmpty } from 'class-validator';
 
 export class OrderProductDTO {
-  @ApiProperty()
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
   @IsInt()
   productId: number;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsInt()
   quantity: number;
 }

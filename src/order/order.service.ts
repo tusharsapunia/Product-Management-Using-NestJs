@@ -23,6 +23,9 @@ export class OrderService {
     let Reststock = 0;
 
     for (const item of data.products) {
+      if (!item.productId || !item.quantity) {
+        return 'please Enter Valid Data';
+      }
       const product = await this.ProductRepository.findOneBy({
         id: item.productId,
       });
@@ -31,7 +34,7 @@ export class OrderService {
         throw new NotFoundException('Product not found');
       }
 
-      Reststock += item.quantity; 
+      Reststock += item.quantity;
       if (product.stock < Reststock) {
         throw new NotFoundException(
           `we have not enough stock for product id ${product.id}`,

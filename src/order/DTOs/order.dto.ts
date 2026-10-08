@@ -1,7 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsInt, IsString } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { OrderProductDTO } from './orderproduct.dto.js';
 import { OrderEnum } from '../enum/orderstatus.enum.js';
+import { Type } from 'class-transformer';
 export class OrderDTO {
   // @ApiProperty()
   // @IsInt()
@@ -18,8 +26,11 @@ export class OrderDTO {
   @IsString()
   address: string;
 
-  @ApiProperty({ type: [OrderProductDTO] })
+  @ApiProperty({ type: [OrderProductDTO], required: true })
   @IsArray()
+  @ArrayNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => OrderProductDTO)
   products: OrderProductDTO[];
 
   @ApiProperty()

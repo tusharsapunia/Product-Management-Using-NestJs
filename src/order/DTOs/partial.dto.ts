@@ -1,5 +1,4 @@
-import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
-import { OrderEnum } from '../enum/orderstatus.enum.js';
+import {IsInt, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class partialOrder {

@@ -13,6 +13,7 @@ import {
 import { ProductService } from './product.service.js';
 import { ProductDTO } from './Dtos/product.dto.js';
 import { PartialProduct } from './Dtos/partial.dto.js';
+import { ApiQuery } from '@nestjs/swagger';
 
 @Controller('product')
 export class ProductController {
@@ -26,8 +27,31 @@ export class ProductController {
 
   //Get Method:-
   @Get()
-  async getAll(@Query('page') page = '1', @Query('limit') limit = '10' , @Query('search') search:string) {
-    return this.productService.getAllProduct(Number(page), Number(limit) , search);
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: 'string',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: 'string',
+  })
+  async getAll(
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
+    @Query('search') search?: string,
+  ) {
+    return this.productService.getAllProduct(
+      Number(page),
+      Number(limit),
+      search,
+    );
   }
   @Get(':id')
   async getOne(@Param('id') id: number) {

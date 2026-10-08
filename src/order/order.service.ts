@@ -7,7 +7,6 @@ import { OrderDTO } from './dtos/order.dto.js';
 import { partialOrder } from './dtos/partial.dto.js';
 import { StatusOrder } from './dtos/statusorder.dto.js';
 import { OrderItem } from './entity/orderItem.entity.js';
-import { constants } from 'buffer';
 
 @Injectable()
 export class OrderService {
@@ -32,7 +31,7 @@ export class OrderService {
         throw new NotFoundException('Product not found');
       }
 
-      Reststock += item.quantity;
+      Reststock += item.quantity; 
       if (product.stock < Reststock) {
         throw new NotFoundException(
           `we have not enough stock for product id ${product.id}`,

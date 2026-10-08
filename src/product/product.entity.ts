@@ -7,19 +7,22 @@ export class Product {
 
   @Column()
   name: string;
-  
+
   // @Column()
   // description: string;
-  
+
   @Column()
   price: number;
-  
+
   @Column()
   stock: number;
-  
+
   @Column()
   category: string;
-  
+
   @Column()
   status: string;
+
+  @Column()
+  image: string;
 }

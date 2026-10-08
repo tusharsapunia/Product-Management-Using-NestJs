@@ -9,20 +9,44 @@ import {
   Put,
   Query,
   Search,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProductService } from './product.service.js';
 import { ProductDTO } from './Dtos/product.dto.js';
 import { PartialProduct } from './Dtos/partial.dto.js';
-import { ApiQuery } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiQuery } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   // Post Method:-
+
   @Post()
-  async createProduct(@Body() data: ProductDTO) {
-    return this.productService.createProduct(data);
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        price: { type: 'number' },
+        stock: { type: 'number' },
+        category: { type: 'string' },
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('image'))
+  async createProduct(
+    @Body() data: ProductDTO,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
+    return this.productService.createProduct(data, image);
   }
 
   //Get Method:-

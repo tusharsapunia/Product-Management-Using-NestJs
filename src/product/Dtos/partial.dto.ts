@@ -5,20 +5,24 @@ import { Type } from 'class-transformer';
 
 export class PartialProduct {
   @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
-  name?: string;
+  name: string;
 
   @ApiPropertyOptional()
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  price?: number;
+  price: number;
 
+  @IsOptional()
   @ApiPropertyOptional()
   @Type(() => Number)
   @IsInt()
   stock?: number;
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   category?: string;
 

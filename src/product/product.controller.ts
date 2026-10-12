@@ -8,22 +8,26 @@ import {
   Post,
   Put,
   Query,
-  Search,
+  Request,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ProductService } from './product.service.js';
 import { ProductDTO } from './Dtos/product.dto.js';
 import { PartialProduct } from './Dtos/partial.dto.js';
-import { ApiBody, ApiConsumes, ApiQuery } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '@nestjs/passport';
 
+@ApiBearerAuth()
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   // Post Method:-
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
@@ -36,6 +40,7 @@ export class ProductController {
   }
 
   //Get Method:-
+
   @Get()
   @ApiQuery({
     name: 'search',
@@ -63,12 +68,14 @@ export class ProductController {
       search,
     );
   }
+
   @Get(':id')
-  async getOne(@Param('id') id: number) {
+  async getOne(@Param('id') id: number, @Request() req: any) {
     return this.productService.getProductById(id);
   }
 
   //Put Method:-
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
@@ -81,6 +88,7 @@ export class ProductController {
     return this.productService.updateProduct(id, data);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
@@ -94,6 +102,8 @@ export class ProductController {
     }
     return this.productService.patchUpdate(id, data);
   }
+
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async delete(@Param('id') id: number) {
     return this.productService.productDelete(id);

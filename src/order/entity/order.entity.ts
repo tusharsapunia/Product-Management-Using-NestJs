@@ -9,6 +9,9 @@ export class Order {
   @Column()
   name: string;
 
+  @Column()
+  userId: number;
+
   @Column({ type: 'bigint' })
   mobile: bigint;
 

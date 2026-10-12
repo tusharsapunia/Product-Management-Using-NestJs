@@ -7,20 +7,28 @@ import { OrderDTO } from './dtos/order.dto.js';
 import { partialOrder } from './dtos/partial.dto.js';
 import { StatusOrder } from './dtos/statusorder.dto.js';
 import { OrderItem } from './entity/orderItem.entity.js';
+import { AuthEntity } from '../auth/auth.entity.js';
+import { Console } from 'console';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectRepository(Order) private OrderRepository: Repository<Order>,
+    @InjectRepository(AuthEntity)
+    private UserRepository: Repository<AuthEntity>,
     @InjectRepository(Product) private ProductRepository: Repository<Product>,
     @InjectRepository(OrderItem)
     private OrderItemRepository: Repository<OrderItem>,
   ) {}
 
-  async createOrder(data: OrderDTO) {
+  async createOrder(data: OrderDTO, req: any) {
     const products = [];
     let TotalAmount = 0;
     let Reststock = 0;
+
+    console.log('REQ--------', req);
+    const { userId, name, mobile } = req;
+    console.log(Number(mobile));
 
     for (const item of data.products) {
       if (!item.productId || !item.quantity) {
@@ -52,12 +60,15 @@ export class OrderService {
     }
 
     const order = this.OrderRepository.create({
-      name: data.name,
-      mobile: data.mobile,
+      // ...req,
+      userId: userId,
+      name: name,
+      mobile: mobile,
       address: data.address,
       amount: TotalAmount,
       status: data.status,
     });
+    console.log(order);
     const save = await this.OrderRepository.save(order);
     products.forEach((elem) => {
       const orderItem = this.OrderItemRepository.create({
@@ -73,8 +84,8 @@ export class OrderService {
   }
 
   //
-  async updateOrder(id: number, data: partialOrder) {
-    const order = await this.OrderRepository.findOneBy({ id });
+  async updateOrder(id: number, data: partialOrder, req: any) {
+    const order = await this.OrderRepository.findOneBy({ id, userId: req });
 
     if (!order) {
       throw new NotFoundException('Order Not Found');
@@ -89,8 +100,8 @@ export class OrderService {
     return await this.OrderRepository.findOneBy({ id });
   }
 
-  async updateStatus(id: number, data: StatusOrder) {
-    const order = await this.OrderRepository.findOneBy({ id });
+  async updateStatus(id: number, data: StatusOrder, req: any) {
+    const order = await this.OrderRepository.findOneBy({ id, userId: req });
 
     if (!order) {
       throw new NotFoundException('Order Not Found');
@@ -127,13 +138,14 @@ export class OrderService {
   //
   //
   //
-  async getAll(page = 1, limit = 10, search?: string) {
+  async getAll(req: any, page = 1, limit = 10, search?: string) {
     const skip = (page - 1) * limit;
 
     const [data, total] = await this.OrderRepository.findAndCount({
       where: search
         ? {
             name: search,
+            userId: req,
           }
         : {},
       skip,
@@ -148,8 +160,11 @@ export class OrderService {
     };
   }
 
-  async getById(id: number): Promise<Order | null> {
-    const Data = await this.OrderRepository.findOneBy({ id });
+  async getById(id: number, user: any): Promise<Order | null> {
+    const Data = await this.OrderRepository.findOneBy({
+      id,
+      userId: user,
+    });
     if (!Data) {
       throw new NotFoundException('Order Not found');
     }

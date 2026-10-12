@@ -7,6 +7,8 @@ import { PartialProduct } from './Dtos/partial.dto.js';
 import { SUPABASE_CLIENT } from './supabase/supabase.provider.js';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { image } from '../util/upload-image.js';
+import { checkPrime } from 'node:crypto';
+import { findIndex } from 'rxjs';
 
 @Injectable()
 export class ProductService {
@@ -84,7 +86,7 @@ export class ProductService {
 
   async patchUpdate(
     id: number,
-    data:PartialProduct,
+    data: Partial<PartialProduct>,
   ): Promise<Product | null> {
     const Data = await this.ProductRepo.findOneBy({ id });
 
@@ -107,11 +109,15 @@ export class ProductService {
       status = 'INACTIVE';
     }
 
-    console.log('CATEgry-----', data);
+    // const updateData = Object.fromEntries(
+    //   Object.entries(data).filter(
+    //     ([key, value]) => value !== '' && value !== undefined && value !== null,
+    //   ),
+    // );
+
+    console.log('Swagger Data -----', data);
     await this.ProductRepo.update(id, {
-      ...((data.category != undefined || data.category != '') && {
-        category: data.category,
-      }),
+      ...data,
       image: Url,
       status: status,
     });

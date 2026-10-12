@@ -13,14 +13,7 @@ import { Type } from 'class-transformer';
 export class OrderDTO {
   // @ApiProperty()
   // @IsInt()
-  // id: number;
-  @ApiProperty()
-  @IsString()
-  name: string;
-
-  @ApiProperty()
-  @IsInt()
-  mobile: bigint;
+  // userId: number;
 
   @ApiProperty()
   @IsString()

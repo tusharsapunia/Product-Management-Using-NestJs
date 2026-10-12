@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsInt, IsString } from 'class-validator';
-// import { ProductEnum } from '../enum/product.enum.js';
 import { Type } from 'class-transformer';
 export class ProductDTO {
   @ApiProperty()
@@ -21,7 +20,6 @@ export class ProductDTO {
   @IsString()
   category: string;
 
-  // @ApiProperty()
-  // @IsEnum(ProductEnum)
-  // status: ProductEnum;
+  @ApiProperty({ type: 'string', format: 'binary' })
+  image: Express.Multer.File;
 }

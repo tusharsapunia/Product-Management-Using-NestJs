@@ -26,27 +26,13 @@ export class ProductController {
 
   @Post()
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string' },
-        price: { type: 'number' },
-        stock: { type: 'number' },
-        category: { type: 'string' },
-        image: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
   @UseInterceptors(FileInterceptor('image'))
   async createProduct(
     @Body() data: ProductDTO,
     @UploadedFile() image: Express.Multer.File,
   ) {
-    return this.productService.createProduct(data, image);
+    data.image = image;
+    return this.productService.createProduct(data);
   }
 
   //Get Method:-
@@ -83,17 +69,31 @@ export class ProductController {
   }
 
   //Put Method:-
-
   @Put(':id')
-  async update(@Param('id') id: number, @Body() data: ProductDTO) {
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('image'))
+  async update(
+    @Param('id') id: number,
+    @Body() data: ProductDTO,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
+    data.image = image;
     return this.productService.updateProduct(id, data);
   }
 
   @Patch(':id')
-  async patchupdate(@Param('id') id: number, @Body() data: PartialProduct) {
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('image'))
+  async patchupdate(
+    @Param('id') id: number,
+    @Body() data: PartialProduct,
+    @UploadedFile() image?: Express.Multer.File,
+  ) {
+    if (image) {
+      data.image = image;
+    }
     return this.productService.patchUpdate(id, data);
   }
-
   @Delete(':id')
   async delete(@Param('id') id: number) {
     return this.productService.productDelete(id);

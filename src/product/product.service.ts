@@ -6,34 +6,19 @@ import { Repository } from 'typeorm';
 import { PartialProduct } from './Dtos/partial.dto.js';
 import { SUPABASE_CLIENT } from './supabase/supabase.provider.js';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { image } from '../util/upload-image.js';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product) private ProductRepo: Repository<Product>,
     @Inject(SUPABASE_CLIENT) private readonly supabase: SupabaseClient,
+    private readonly UploadImage: image,
   ) {}
 
   //Method For insert Product:-
-  async createProduct(
-    data: ProductDTO,
-    image: Express.Multer.File,
-  ): Promise<Product> {
-    const filePath = `${Date.now()}-${image.originalname}`;
-    const { data: uploadedFile, error } = await this.supabase.storage
-      .from(process.env.SUPABASE_BUCKET!)
-      .upload(filePath, image.buffer, {
-        contentType: image.mimetype,
-      });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    const imageUrl = await this.supabase.storage
-      .from(process.env.SUPABASE_BUCKET!)
-      .getPublicUrl(uploadedFile.path).data.publicUrl;
-
+  async createProduct(data: ProductDTO): Promise<Product> {
+    let Url = await this.UploadImage.uploadImage(data.image);
     let status = '';
     if (data.stock > 0) {
       status = 'ACTIVE';
@@ -43,7 +28,7 @@ export class ProductService {
 
     const newProduct = this.ProductRepo.create({
       ...data,
-      image: imageUrl,
+      image: Url,
       status: status,
     });
     return this.ProductRepo.save(newProduct);
@@ -82,16 +67,54 @@ export class ProductService {
     if (!Data) {
       throw new NotFoundException('ProductNot Found...');
     }
-    await this.ProductRepo.update(id, { stock: 7 });
+    let Url = await this.UploadImage.uploadImage(data.image);
+    let status = '';
+    if (data.stock > 0) {
+      status = 'ACTIVE';
+    } else {
+      status = 'INACTIVE';
+    }
+    await this.ProductRepo.update(id, {
+      ...data,
+      image: Url,
+      status: status,
+    });
     return await this.ProductRepo.findOneBy({ id });
   }
 
-  async patchUpdate(id: number, data: PartialProduct): Promise<Product | null> {
+  async patchUpdate(
+    id: number,
+    data:PartialProduct,
+  ): Promise<Product | null> {
     const Data = await this.ProductRepo.findOneBy({ id });
+
     if (!Data) {
       throw new NotFoundException('ProductNot Found...');
     }
-    await this.ProductRepo.update(id, data);
+
+    let Url = Data.image;
+    if (!data.image) {
+      Url = Data.image;
+    } else {
+      Url = await this.UploadImage.uploadImage(data.image);
+    }
+    let status = Data.status;
+    if (!data.stock) {
+      status = Data.status;
+    } else if (data.stock > 0) {
+      status = 'ACTIVE';
+    } else {
+      status = 'INACTIVE';
+    }
+
+    console.log('CATEgry-----', data);
+    await this.ProductRepo.update(id, {
+      ...((data.category != undefined || data.category != '') && {
+        category: data.category,
+      }),
+      image: Url,
+      status: status,
+    });
     return await this.ProductRepo.findOneBy({ id });
   }
 

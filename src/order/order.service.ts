@@ -25,8 +25,9 @@ export class OrderService {
     const products = [];
     let TotalAmount = 0;
     let Reststock = 0;
+    let status = '';
 
-    console.log('REQ--------', req);
+    // console.log('REQ--------', req);
     const { userId, name, mobile } = req;
     console.log(Number(mobile));
 
@@ -48,8 +49,9 @@ export class OrderService {
           `we have not enough stock for product id ${product.id}`,
         );
       }
+      status = 'PENDING';
       let stock = product.stock - Reststock;
-      TotalAmount += product.price;
+      TotalAmount += product.price * item.quantity;
       this.ProductRepository.update(product.id, { stock: stock });
 
       products.push({
@@ -66,9 +68,9 @@ export class OrderService {
       mobile: mobile,
       address: data.address,
       amount: TotalAmount,
-      status: data.status,
+      status: status,
     });
-    console.log(order);
+    // console.log(order);
     const save = await this.OrderRepository.save(order);
     products.forEach((elem) => {
       const orderItem = this.OrderItemRepository.create({
@@ -142,12 +144,10 @@ export class OrderService {
     const skip = (page - 1) * limit;
 
     const [data, total] = await this.OrderRepository.findAndCount({
-      where: search
-        ? {
-            name: search,
-            userId: req,
-          }
-        : {},
+      where: {
+        userId: req,
+        ...(search ? { name: search } : {}),
+      },
       skip,
       take: limit,
     });

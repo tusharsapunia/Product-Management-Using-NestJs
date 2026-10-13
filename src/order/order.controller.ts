@@ -16,6 +16,7 @@ import { partialOrder } from './dtos/partial.dto.js';
 import { StatusOrder } from './dtos/statusorder.dto.js';
 import { ApiBearerAuth, ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { OrderQueries } from '../decorators/queries.decorator.js';
 
 // @UseGuards(AuthGuard('jwt'))
 @ApiBearerAuth()
@@ -26,7 +27,6 @@ export class OrderController {
 
   @Post()
   async createOrder(@Body() Data: OrderDTO, @Req() req: any) {
-    console.log(req.user);
     return this.orderService.createOrder(Data, req.user);
   }
 
@@ -50,21 +50,7 @@ export class OrderController {
 
   // @UseGuards(AuthGuard('jwt'))
   @Get()
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: 'string',
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: 'string',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: 'string',
-  })
+  @OrderQueries()
   getAll(
     @Request() req: any,
     @Query('page') page = '1',
@@ -72,9 +58,10 @@ export class OrderController {
     @Query('search') search?: string,
   ) {
     return this.orderService.getAll(
+      req.user.userId,
+
       Number(page),
       Number(limit),
-      req.user.userId,
       search,
     );
   }

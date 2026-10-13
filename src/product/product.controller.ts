@@ -19,14 +19,14 @@ import { PartialProduct } from './Dtos/partial.dto.js';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
+import { OrderQueries } from '../decorators/queries.decorator.js';
 
-@ApiBearerAuth()
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   // Post Method:-
-
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post()
   @ApiConsumes('multipart/form-data')
@@ -42,21 +42,7 @@ export class ProductController {
   //Get Method:-
 
   @Get()
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: 'string',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: 'string',
-  })
+  @OrderQueries()
   async getAll(
     @Query('page') page = '1',
     @Query('limit') limit = '10',
@@ -75,6 +61,7 @@ export class ProductController {
   }
 
   //Put Method:-
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   @ApiConsumes('multipart/form-data')
@@ -88,6 +75,7 @@ export class ProductController {
     return this.productService.updateProduct(id, data);
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   @ApiConsumes('multipart/form-data')
@@ -103,6 +91,7 @@ export class ProductController {
     return this.productService.patchUpdate(id, data);
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async delete(@Param('id') id: number) {

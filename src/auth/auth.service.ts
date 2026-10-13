@@ -33,22 +33,19 @@ export class AuthService {
       throw new NotFoundException('User Not Found Please Signup');
     }
 
-    console.log('User---------', user);
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       throw new NotFoundException('Incorrect Password!!');
     }
-    const playload = {
+    const payload = {
       name: user.name,
       userID: user.id,
       email: user.email,
       mobileNumber: user.mobileNumber,
     };
 
-    console.log('payload-------', playload);
-
     return {
-      access_Token: this.JwtSerivce.sign(playload),
+      access_Token: this.JwtSerivce.sign(payload, { expiresIn: '10s' }),
     };
   }
 }

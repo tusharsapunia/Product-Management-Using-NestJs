@@ -26,7 +26,7 @@ export class OrderDTO {
   @Type(() => OrderProductDTO)
   products: OrderProductDTO[];
 
-  @ApiProperty()
-  @IsEnum(OrderEnum)
-  status: OrderEnum;
+  // @ApiProperty()
+  // @IsEnum(OrderEnum)
+  // status: OrderEnum;
 }

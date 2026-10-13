@@ -1,5 +1,12 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { OrderItem } from './orderItem.entity.js';
+import { AuthEntity } from '../../auth/auth.entity.js';
 
 @Entity()
 export class Order {
@@ -9,8 +16,8 @@ export class Order {
   @Column()
   name: string;
 
-  @Column()
-  userId: number;
+  @ManyToOne(() => AuthEntity, (auth) => auth.id)
+  userId: AuthEntity[];
 
   @Column({ type: 'bigint' })
   mobile: bigint;

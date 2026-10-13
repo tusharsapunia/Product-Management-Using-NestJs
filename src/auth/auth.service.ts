@@ -13,13 +13,14 @@ export class AuthService {
     @InjectRepository(AuthEntity) private AuthRepo: Repository<AuthEntity>,
   ) {}
 
-  async signup(data: AuthuserDTO) {
+  async signup(data: AuthuserDTO, role: string) {
     const hashPassword = await bcrypt.hash(data.password, 10);
     const userInfo = this.AuthRepo.create({
       name: data.name,
       mobileNumber: data.mobile,
       email: data.email,
       password: hashPassword,
+      role: role,
     });
 
     return this.AuthRepo.save(userInfo);
@@ -42,10 +43,11 @@ export class AuthService {
       userID: user.id,
       email: user.email,
       mobileNumber: user.mobileNumber,
+      role: user.role,
     };
 
     return {
-      access_Token: this.JwtSerivce.sign(payload, { expiresIn: '10s' }),
+      access_Token: this.JwtSerivce.sign(payload, { expiresIn: '10m' }),
     };
   }
 }

@@ -7,9 +7,14 @@ import { Order } from './entity/order.entity.js';
 import { OrderItem } from './entity/orderItem.entity.js';
 import { AuthModule } from '../auth/auth.module.js';
 import { AuthEntity } from '../auth/auth.entity.js';
+import { MailModule } from '../mail/mail.module.js';
 
 @Module({
-  imports: [AuthModule,TypeOrmModule.forFeature([Order,AuthEntity, Product, OrderItem])],
+  imports: [
+    AuthModule,
+    MailModule,
+    TypeOrmModule.forFeature([Order, AuthEntity, Product, OrderItem]),
+  ],
   providers: [OrderService],
   controllers: [OrderController],
 })

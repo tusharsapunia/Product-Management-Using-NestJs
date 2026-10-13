@@ -2,15 +2,20 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { AuthuserDTO } from './dtos/authuser.dto.js';
 import { AuthLoginDTO } from './dtos/authLogin.dto.js';
-import { ApiConsumes } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly AuthService: AuthService) {}
 
-  @Post('signup')
-  async signup(@Body() body: AuthuserDTO) {
-    return this.AuthService.signup(body);
+  @Post('store/signup')
+  async storeSignup(@Body() body: AuthuserDTO) {
+    const role = 'store';
+    return this.AuthService.signup(body, role);
+  }
+  @Post('customer/signup')
+  async customerSignup(@Body() body: AuthuserDTO) {
+    const role = 'customer';
+    return this.AuthService.signup(body, role);
   }
 
   @Post('login')

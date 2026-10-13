@@ -17,10 +17,14 @@ import { StatusOrder } from './dtos/statusorder.dto.js';
 import { ApiBearerAuth, ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { OrderQueries } from '../decorators/queries.decorator.js';
+import { RolesGuard } from '../guard/roles/roles.guard.js';
+import { Roles } from '../guard/roles/roles.decorator.js';
+import { Role } from '../guard/roles/roles.enum.js';
 
 // @UseGuards(AuthGuard('jwt'))
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@Roles(Role.CUSTOMER)
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
@@ -49,6 +53,7 @@ export class OrderController {
   }
 
   // @UseGuards(AuthGuard('jwt'))
+
   @Get()
   @OrderQueries()
   getAll(

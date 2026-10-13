@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+
+import { CategoryEntity } from '../category/entity/category.entity.js';
 
 @Entity()
 export class Product {
@@ -8,17 +16,14 @@ export class Product {
   @Column()
   name: string;
 
-  // @Column()
-  // description: string;
-
   @Column()
   price: number;
 
   @Column()
   stock: number;
 
-  @Column()
-  category: string;
+  @ManyToOne(() => CategoryEntity, (cate) => cate.id)
+  category: CategoryEntity[];
 
   @Column()
   status: string;

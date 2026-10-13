@@ -20,6 +20,9 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
 import { OrderQueries } from '../decorators/queries.decorator.js';
+import { RolesGuard } from '../guard/roles/roles.guard.js';
+import { Roles } from '../guard/roles/roles.decorator.js';
+import { Role } from '../guard/roles/roles.enum.js';
 
 @Controller('product')
 export class ProductController {
@@ -27,7 +30,8 @@ export class ProductController {
 
   // Post Method:-
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.STORE)
   @Post()
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
@@ -62,7 +66,8 @@ export class ProductController {
 
   //Put Method:-
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.STORE)
   @Put(':id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
@@ -76,7 +81,8 @@ export class ProductController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.STORE)
   @Patch(':id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
@@ -92,7 +98,8 @@ export class ProductController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.STORE)
   @Delete(':id')
   async delete(@Param('id') id: number) {
     return this.productService.productDelete(id);

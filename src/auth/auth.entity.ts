@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Order } from '../order/entity/order.entity.js';
 
 @Entity()
 export class AuthEntity {
@@ -15,5 +16,11 @@ export class AuthEntity {
   email: string;
 
   @Column()
+  role: string;
+
+  @Column()
   password: string;
+
+  @OneToMany(() => Order, (order) => order)
+  order: Order[];
 }

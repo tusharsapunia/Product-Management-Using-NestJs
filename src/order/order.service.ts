@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entity/order.entity.js';
 import { Repository } from 'typeorm';
@@ -8,7 +12,7 @@ import { partialOrder } from './dtos/partial.dto.js';
 import { StatusOrder } from './dtos/statusorder.dto.js';
 import { OrderItem } from './entity/orderItem.entity.js';
 import { AuthEntity } from '../auth/auth.entity.js';
-import { Console } from 'console';
+import { MailService } from '../mail/mail.service.js';
 
 @Injectable()
 export class OrderService {
@@ -19,6 +23,7 @@ export class OrderService {
     @InjectRepository(Product) private ProductRepository: Repository<Product>,
     @InjectRepository(OrderItem)
     private OrderItemRepository: Repository<OrderItem>,
+    private readonly MailService: MailService,
   ) {}
 
   async createOrder(data: OrderDTO, req: any) {
@@ -27,9 +32,8 @@ export class OrderService {
     let Reststock = 0;
     let status = '';
 
-    // console.log('REQ--------', req);
-    const { userId, name, mobile } = req;
-    console.log(Number(mobile));
+    const { userId, name, mobile, email } = req;
+    // console.log(email);
 
     for (const item of data.products) {
       if (!item.productId || !item.quantity) {
@@ -70,8 +74,37 @@ export class OrderService {
       amount: TotalAmount,
       status: status,
     });
-    // console.log(order);
+
     const save = await this.OrderRepository.save(order);
+    const subject = `Order Confirmation for Id :- ${save.id}`;
+    const text = `**Subject: Order Confirmed! 🎉 Your Order Has Been Placed Successfully**
+
+        Hi { ${name},
+
+        Great news! 🎉
+
+        Thank you for shopping with us. We're happy to confirm that your order has been placed successfully.
+
+        **Here are your order details:**
+
+        - **Order ID:** {${save.id}}
+        - **Total Amount:** ₹{${TotalAmount}}
+        - **Order Status:** {${status}
+
+        Our team is preparing your order, and we'll keep you updated as it moves through the delivery process.
+
+        If you have any questions or need assistance, please feel free to contact our support team.
+
+        Thank you for choosing us. We truly appreciate your trust and look forward to serving you again!
+
+        Warm regards,  
+        Thank you for shopping with us! ❤️`;
+
+    try {
+      await this.MailService.sendEmail(email, subject, text);
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
     products.forEach((elem) => {
       const orderItem = this.OrderItemRepository.create({
         orderId: save.id,

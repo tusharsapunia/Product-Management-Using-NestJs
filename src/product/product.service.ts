@@ -109,15 +109,23 @@ export class ProductService {
       status = 'INACTIVE';
     }
 
-    // const updateData = Object.fromEntries(
-    //   Object.entries(data).filter(
-    //     ([key, value]) => value !== '' && value !== undefined && value !== null,
-    //   ),
-    // );
+    let price = Data.price;
+    let stock2 = Data.stock;
+    let name = Data.name;
+    if (data.price !== undefined && data.price !== null && data.price !== 0) {
+      price = data.price;
+    }
+    if (data.name !== undefined && data.name !== '') {
+      name = data.name;
+    }
+    if (data.stock !== undefined && data.stock !== null && data.stock !== 0) {
+      stock2 = data.stock;
+    }
 
-    console.log('Swagger Data -----', data);
     await this.ProductRepo.update(id, {
-      ...data,
+      name: name,
+      price: price,
+      stock: stock2,
       image: Url,
       status: status,
     });

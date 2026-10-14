@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
-import { ProductModule } from './product/product.module.js';
+import { ProductModule } from './modules/product/product.module.js';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OrderModule } from './order/order.module.js';
-import { AuthModule } from './auth/auth.module.js';
-import { CategoryModule } from './category/category.module.js';
-import { MailModule } from './mail/mail.module.js';
+import { OrderModule } from './modules/order/order.module.js';
+import { AuthModule } from './modules/auth/auth.module.js';
+import { CategoryModule } from './modules/category/category.module.js';
+import { MailModule } from './modules/mail/mail.module.js';
 
 @Module({
   imports: [
@@ -28,7 +26,7 @@ import { MailModule } from './mail/mail.module.js';
 
     MailModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

@@ -19,14 +19,15 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('tushar/api', app, document);
 
   await app.listen(process.env.PORT ?? 3000);
   console.log(
     `SERVER RUNNING ON :- http://localhost:${process.env.PORT ?? 3000}`,
   );
-  console.log(
-    `SWAGGER RUNNING ON :- http://localhost:${process.env.PORT ?? 3000}/api`,
-  );
+
+  // console.log(
+  //   `SWAGGER RUNNING ON :- http://localhost:${process.env.PORT ?? 3000}/api`,
+  // );
 }
 await bootstrap();

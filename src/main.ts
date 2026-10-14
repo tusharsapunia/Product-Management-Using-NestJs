@@ -26,8 +26,8 @@ async function bootstrap() {
     `SERVER RUNNING ON :- http://localhost:${process.env.PORT ?? 3000}`,
   );
 
-  // console.log(
-  //   `SWAGGER RUNNING ON :- http://localhost:${process.env.PORT ?? 3000}/api`,
-  // );
+  console.log(
+    `SWAGGER RUNNING ON :- http://localhost:${process.env.PORT ?? 3000}/tushar/api`,
+  );
 }
 await bootstrap();

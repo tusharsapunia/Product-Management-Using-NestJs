@@ -13,15 +13,24 @@ import { AuthLoginDTO } from './dtos/authLogin.dto.js';
 import { MailService } from '../mail/mail.service.js';
 import { VerifyEmailDto } from './dtos/verifyEmail.dto.js';
 import { GetOtpDto } from './dtos/getOtp.dto.js';
+import { RolesPermissionsEntity } from './entity/role.entity.js';
 @Injectable()
 export class AuthService {
   constructor(
     private JwtSerivce: JwtService,
     @InjectRepository(AuthEntity) private AuthRepo: Repository<AuthEntity>,
+    @InjectRepository(RolesPermissionsEntity)
+    private RolePerRepo: Repository<RolesPermissionsEntity>,
     private readonly MailService: MailService,
   ) {}
 
   async signup(data: AuthuserDTO, role: string) {
+    const roles = await this.RolePerRepo.findOne({
+      where: { role_name: role },
+    });
+    if (!roles) {
+      throw new ConflictException('No role Found ');
+    }
     const hashPassword = await bcrypt.hash(data.password, 10);
     const existingUser = await this.AuthRepo.findOne({
       where: { email: data.email },
@@ -29,12 +38,13 @@ export class AuthService {
     if (existingUser) {
       throw new ConflictException('user already registered');
     }
+
     const userInfo = this.AuthRepo.create({
       name: data.name,
       mobileNumber: data.mobile,
       email: data.email,
       password: hashPassword,
-      role: role,
+      role: { id: roles.id },
     });
     await this.MailService.sendOtp(data.email);
 
@@ -91,7 +101,7 @@ export class AuthService {
       email: existingUser.email,
       mobileNumber: existingUser.mobileNumber,
       role: existingUser.role,
-      isVerified: existingUser.isEmailVerified,
+      isVerified: true,
     };
 
     return {

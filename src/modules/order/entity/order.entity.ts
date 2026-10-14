@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { OrderItem } from './orderItem.entity.js';
 import { AuthEntity } from '../../auth/entity/auth.entity.js';
+import type { Relation } from 'typeorm';
 
 @Entity()
 export class Order {
@@ -19,7 +20,7 @@ export class Order {
 
   @ManyToOne(() => AuthEntity)
   @JoinColumn({ name: 'userId' })
-  userId: AuthEntity;
+  userId: Relation<AuthEntity>;
 
   @Column({ type: 'bigint' })
   mobile: bigint;

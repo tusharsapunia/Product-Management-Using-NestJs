@@ -11,12 +11,12 @@ export class AuthController {
 
   @Post('store/Register')
   async storeSignup(@Body() body: AuthuserDTO) {
-    const role = 'store';
+    const role = 'STORE';
     return this.AuthService.signup(body, role);
   }
   @Post('customer/Register')
   async customerSignup(@Body() body: AuthuserDTO) {
-    const role = 'customer';
+    const role = 'CUSTOMER';
     return this.AuthService.signup(body, role);
   }
   @Post('GetOtp')

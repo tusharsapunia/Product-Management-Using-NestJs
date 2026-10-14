@@ -1,5 +1,15 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Order } from '../../order/entity/order.entity.js';
+import { RolesPermissionsEntity } from './role.entity.js';
 
 @Entity()
 export class AuthEntity {
@@ -15,8 +25,11 @@ export class AuthEntity {
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  role: string;
+  @ManyToOne(() => RolesPermissionsEntity, (role) => role.users, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'role_id' })
+  role: RolesPermissionsEntity;
 
   @Column()
   password: string;

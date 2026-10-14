@@ -84,4 +84,41 @@ export class MailService {
       throw new InternalServerErrorException('Email Sending failed');
     }
   }
+  async sendOtpAndPass(email: string, pass: string) {
+    let otp = crypto.randomInt(100000, 1000000);
+    let hashOpt = await bcrypt.hash(String(otp), 10);
+    let expiredAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    const existingUser = await this.Authrepo.findOne({
+      where: { email: email },
+    });
+
+    if (!existingUser) {
+      throw new NotFoundException('User not found for this email');
+    }
+    const id = existingUser.id;
+    if (existingUser.isEmailVerified) {
+      throw new ConflictException('User Already verified');
+    }
+    await this.Authrepo.update(id, {
+      hashOtp: hashOpt,
+      expiredAt: expiredAt,
+    });
+
+    try {
+      const result = await this.transporter.sendMail({
+        from: this.ConfigService.get<string>('SMTP_USER'),
+        to: email,
+        subject: `User Email Verification`,
+        text: `Verify  your email Using this Otp :- ${otp} \n And your Passsword is : ${pass}`,
+      });
+
+      return {
+        message: 'Email Send successfully',
+        messageId: result.messageId,
+      };
+    } catch {
+      throw new InternalServerErrorException('Email Sending failed');
+    }
+  }
 }

@@ -16,13 +16,15 @@ import {
 import { ProductService } from './product.service.js';
 import { ProductDTO } from './dtos/product.dto.js';
 import { PartialProduct } from './dtos/partial.dto.js';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
 import { OrderQueries } from '../../core/decorators/queries.decorator.js';
-import { RolesGuard } from '../../core/guards/roles/roles.guard.js';
-import { Roles } from '../../core/decorators/roles.decorator.js'; 
-import { Role } from '../../shared/enum/roles.enum.js';
+// import { RolesGuard } from '../../core/guards/roles/roles.guard.js';
+// import { Roles } from '../../core/decorators/roles.decorator.js';
+// import { Role } from '../../shared/enum/roles.enum.js';
+import { PermissionsGuard } from '../../core/guards/permission/permission.guard.js';
+import { Permissions } from '../../core/decorators/permission.decorator.js';
 
 @Controller('product')
 export class ProductController {
@@ -30,8 +32,8 @@ export class ProductController {
 
   // Post Method:-
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.STORE)
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('product:create')
   @Post()
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
@@ -66,8 +68,8 @@ export class ProductController {
 
   //Put Method:-
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.STORE)
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('product:update')
   @Put(':id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
@@ -81,8 +83,8 @@ export class ProductController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.STORE)
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('product:update')
   @Patch(':id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
@@ -98,8 +100,8 @@ export class ProductController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.STORE)
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('product:delete')
   @Delete(':id')
   async delete(@Param('id') id: number) {
     return this.productService.productDelete(id);

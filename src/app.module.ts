@@ -6,6 +6,7 @@ import { OrderModule } from './modules/order/order.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CategoryModule } from './modules/category/category.module.js';
 import { MailModule } from './modules/mail/mail.module.js';
+import { StaffModule } from './modules/staff/staff.module.js';
 
 @Module({
   imports: [
@@ -19,12 +20,10 @@ import { MailModule } from './modules/mail/mail.module.js';
     }),
 
     OrderModule,
-
     AuthModule,
-
     CategoryModule,
-
     MailModule,
+    StaffModule,
   ],
   controllers: [],
   providers: [],

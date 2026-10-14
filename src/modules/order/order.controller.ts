@@ -17,10 +17,9 @@ import { StatusOrder } from './dtos/statusorder.dto.js';
 import { ApiBearerAuth, ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { OrderQueries } from '../../core/decorators/queries.decorator.js';
-import { RolesGuard } from '../../core/guards/roles/roles.guard.js';
-import { Roles } from '../../core/decorators/roles.decorator.js';
-import { Role } from '../../shared/enum/roles.enum.js';
 import { StoreOrderStatusDTO } from './dtos/storeOrderStatus.dto.js';
+import { PermissionsGuard } from '../../core/guards/permission/permission.guard.js';
+import { Permissions } from '../../core/decorators/permission.decorator.js';
 
 // @UseGuards(AuthGuard('jwt'))
 @ApiBearerAuth()
@@ -28,8 +27,8 @@ import { StoreOrderStatusDTO } from './dtos/storeOrderStatus.dto.js';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.CUSTOMER)
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('order:create')
   @Post()
   async createOrder(@Body() Data: OrderDTO, @Req() req: any) {
     return this.orderService.createOrder(Data, req.user);
@@ -37,8 +36,8 @@ export class OrderController {
 
   // @UseGuards(AuthGuard('jwt'))
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.CUSTOMER)
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('order:read')
   @Get()
   @OrderQueries()
   getAll(
@@ -56,16 +55,16 @@ export class OrderController {
     );
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.CUSTOMER)
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('order:read')
   @Get(':id')
   async getbyId(@Param('id') id: number, @Request() req: any) {
     // console.log(req.user);
     return this.orderService.getById(id, req.user.userId);
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.CUSTOMER)
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('order:update')
   @Patch('update/:id')
   async updateData(
     @Param('id') id: number,
@@ -75,8 +74,8 @@ export class OrderController {
     return this.orderService.updateOrder(id, data, req.user.userId);
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.CUSTOMER)
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('order:update')
   @Patch('status/:id')
   async updateStatus(
     @Param('id') id: number,
@@ -87,10 +86,9 @@ export class OrderController {
   }
 
   /// Store Can  do thi
-
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.STORE)
-  @Get('store')
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('order:read-store')
+  @Get('store/getall')
   @OrderQueries()
   getAllBYStore(
     @Query('page') page = '1',
@@ -100,16 +98,16 @@ export class OrderController {
     return this.orderService.GetAllOrder(Number(page), Number(limit), search);
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.STORE)
-  @Get('store/:id')
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('order:read-store')
+  @Get('store/getbyid/:id')
   async getOneBYStore(@Param('id') id: number) {
     return this.orderService.GETBYID(id);
   }
 
   // Update status by Store/Admin
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.STORE)
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('order:update-status')
   @Patch('store/status/:id')
   async storeStatusupdate(
     @Param('id') id: number,

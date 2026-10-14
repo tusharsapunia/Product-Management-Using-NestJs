@@ -23,4 +23,13 @@ export class AuthEntity {
 
   @OneToMany(() => Order, (order) => order)
   order: Order[];
+
+  @Column({ default: false })
+  isEmailVerified: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  hashOtp: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  expiredAt: Date | null;
 }
